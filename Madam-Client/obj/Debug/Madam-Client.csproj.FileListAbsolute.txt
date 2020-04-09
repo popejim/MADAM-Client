@@ -1,0 +1,7 @@
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.exe.config
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.exe
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.pdb
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.csprojAssemblyReference.cache
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.csproj.CoreCompileInputs.cache
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.exe
+C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.pdb
