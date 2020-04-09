@@ -23,6 +23,8 @@ namespace Madam_Client
         protected override void OnStart(string[] args)
         {
             Console.WriteLine("Service Starting....");
+
+            //listener for network address changing
             NetworkChange.NetworkAddressChanged += new NetworkAddressChangedEventHandler(NetworkAddressChanged);
         }
 
@@ -33,25 +35,32 @@ namespace Madam_Client
 
         private void NetworkAddressChanged(object sender, EventArgs e)
         {
+            //gets list of all network interfaces
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
 
             foreach (NetworkInterface n in adapters)
             {
+                //gets the unicast ip's from each network interface
                 foreach (UnicastIPAddressInformation ip in n.GetIPProperties().UnicastAddresses)
                 {
+                    //if the ip is internetwork ipv4, set this to a string
                     if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     {
                         ipv4 = ip.Address.ToString();
                     }
                 } 
+
+                //print out results for debug
                 Console.WriteLine("NetworkMonitor {0} is {1} IP {2}",n.Name, n.OperationalStatus, ipv4);
             }
 
+            //line breaks for debug
             Console.WriteLine(" ");
         }
 
         internal void TestStartupAndStop(string[] args)
         {
+            //needed to run as debug, shouldnt effect when running as service
             this.OnStart(args);
             Console.ReadLine();
             this.OnStop();
