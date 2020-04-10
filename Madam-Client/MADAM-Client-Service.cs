@@ -111,6 +111,7 @@ namespace Madam_Client
                 while (keepGoing == 1)
                 {
                     listener.BeginAccept(new AsyncCallback(Recieve), listener);
+                    Thread.Sleep(60000);
                 }
             }
 
