@@ -1,6 +1,6 @@
 ﻿namespace Madam_Client
 {
-    partial class Service1
+    partial class MadamService
     {
         /// <summary> 
         /// Required designer variable.

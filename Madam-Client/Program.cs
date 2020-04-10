@@ -19,8 +19,8 @@ namespace Madam_Client
             //so VS can debug without installation as service
             if (Environment.UserInteractive)
             {
-                Madam_Client.Service1 service1 = new Madam_Client.Service1();
-                service1.TestStartupAndStop(null);
+                Madam_Client.MadamService madamService = new Madam_Client.MadamService();
+                madamService.TestStartupAndStop(null);
             }
 
             //else run as normal service
@@ -29,7 +29,7 @@ namespace Madam_Client
                 ServiceBase[] ServicesToRun;
                 ServicesToRun = new ServiceBase[]
                 {
-                new Service1()
+                new MadamService()
                 };
                 ServiceBase.Run(ServicesToRun);
             }
