@@ -126,8 +126,11 @@ namespace Madam_Client
             //code executed when the client recieves a packet from the server
             Console.WriteLine("Connection to server established");
             replyRecieved = true;
+            //add bit for reading the incoming packet
+            
             //switch case for different messages to fire different events
             //adding users, updating info etc
+       
             
         }
 
@@ -139,7 +142,7 @@ namespace Madam_Client
                 int port = 42069;
 
                 IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
-                byte[] data = Encoding.ASCII.GetBytes("Client");
+                byte[] data = Encoding.ASCII.GetBytes("find");
 
                 testOut.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                 testOut.SendTo(data, broadcast);
