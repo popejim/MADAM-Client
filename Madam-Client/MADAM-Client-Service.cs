@@ -107,7 +107,11 @@ namespace Madam_Client
                 Console.WriteLine("Listening for connection...");
                 listener.Bind(localEndPoint);
                 listener.Listen(100);
-                listener.BeginAccept(new AsyncCallback(Recieve), listener);
+                int keepGoing = 1;
+                while (keepGoing == 1)
+                {
+                    listener.BeginAccept(new AsyncCallback(Recieve), listener);
+                }
             }
 
             catch (Exception e)
@@ -148,6 +152,8 @@ namespace Madam_Client
                 testOut.SendTo(data, broadcast);
                 Thread.Sleep(10000);
             }
+
+            
         }
     }
 }
