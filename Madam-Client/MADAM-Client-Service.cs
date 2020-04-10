@@ -17,8 +17,10 @@ namespace Madam_Client
     public partial class MadamService : ServiceBase
     {
         private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
-        private Thread _listenerThread;
+        private Thread _connectThread;
+        private Thread _findServerThread;
         public string Ipv4;
+        public bool replyRecieved;
         public MadamService()
         {
             InitializeComponent();
@@ -29,11 +31,19 @@ namespace Madam_Client
             Console.WriteLine("Service Starting....");
             
             //setup new thread for socket listener
-            _listenerThread = new Thread(SocketListener);
-            _listenerThread.Name = "Socket Listener Thread";
-            _listenerThread.IsBackground = true;
-            _listenerThread.Start();
+            _connectThread = new Thread(SocketListenerTcp);
+            _connectThread.Name = "Socket Connection Thread";
+            _connectThread.IsBackground = true;
+            _connectThread.Start();
+
+            //setup new thread for finding server
+            _findServerThread = new Thread(FindServerUdp);
+            _findServerThread.Name = "Find Server Thread";
+            _findServerThread.IsBackground = true;
+            _findServerThread.Start();
+
             //listen for network address change event
+
             NetworkChange.NetworkAddressChanged += new NetworkAddressChangedEventHandler(NetworkAddressChanged);
         }
 
@@ -41,11 +51,12 @@ namespace Madam_Client
         {
             //shutdown listener thread
             _shutdownEvent.Set();
-            if (!_listenerThread.Join(3000))
+            if (!_connectThread.Join(3000))
             { 
-                _listenerThread.Abort();
+                _connectThread.Abort();
             }
             Console.WriteLine("Service Stopping....");
+            //add method to send stopped notification to server
         }
 
         private void NetworkAddressChanged(object sender, EventArgs e)
@@ -81,7 +92,7 @@ namespace Madam_Client
             this.OnStop();
         }
 
-        private void SocketListener()
+        private void SocketListenerTcp()
         {
             //make endpoint for listener on localhost, uses port 42069
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
@@ -112,7 +123,28 @@ namespace Madam_Client
 
         private void Recieve(IAsyncResult ar)
         {
+            //code executed when the client recieves a packet from the server
             Console.WriteLine("Connection to server established");
+            replyRecieved = true;
+            //switch case for different messages to fire different events
+            //adding users, updating info etc
+            
+        }
+
+        private void FindServerUdp()
+        {
+            while (replyRecieved == false)
+            {
+                Socket testOut = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                int port = 42069;
+
+                IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
+                byte[] data = Encoding.ASCII.GetBytes("Client");
+
+                testOut.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                testOut.SendTo(data, broadcast);
+                Thread.Sleep(10000);
+            }
         }
     }
 }
