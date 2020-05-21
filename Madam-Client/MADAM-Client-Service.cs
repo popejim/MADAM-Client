@@ -14,6 +14,7 @@ using System.DirectoryServices;
 using System.IO;
 using System.Collections;
 using System.Management;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Madam_Client
 {
@@ -117,6 +118,7 @@ namespace Madam_Client
                 while (keepGoing == 1)
                 {
                     listener.BeginAccept(new AsyncCallback(Recieve), listener);
+                    IPAddress temp = localEndPoint.Address;
                     Thread.Sleep(60000);
                 }
             }
@@ -136,17 +138,17 @@ namespace Madam_Client
         {
             //code executed when the client recieves a packet from the server
             Console.WriteLine("Connection to server established");
-            replyRecieved = true;
+            replyRecieved = true;   
+            
             //add bit for reading the incoming packet
             
             //switch case for different messages to fire different events
             //adding users, updating info etc
-       
-            
         }
 
         private void FindServerUdp()
         {
+            //sends a udp packet every ten seconds until it finds a server IP
             while (replyRecieved == false)
             {
                 Socket testOut = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -165,7 +167,24 @@ namespace Madam_Client
 
         private void SendIp(string ip)
         {
+            //sleep to ensure new address is up
+            Thread.Sleep(15000);
 
+            //create tcp client to the endpoint
+            TcpClient client = new TcpClient("192.168.88.11", 42069);
+            NetworkStream nwStream = client.GetStream();
+            byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(ip);
+
+            //---send the text---
+            Console.WriteLine("Sending : " + ip);
+            nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+
+            //---read back the text---
+            byte[] bytesToRead = new byte[client.ReceiveBufferSize];
+            int bytesRead = nwStream.Read(bytesToRead, 0, client.ReceiveBufferSize);
+            Console.WriteLine("Received : " + Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
+            Console.ReadLine();
+            client.Close();
         }
 
         private void CheckUsers()
@@ -173,7 +192,7 @@ namespace Madam_Client
             //gets information for all local users on the machine
             ManagementObjectSearcher findUsers = new ManagementObjectSearcher(@"SELECT * FROM Win32_UserAccount");
             ManagementObjectCollection users = findUsers.Get();
-
+            List<Users> userList = new List<Users>();
             var localUsers = users.Cast<ManagementObject>().Where(
                 u => (bool)u["LocalAccount"] == true &&
                      (bool)u["Disabled"] == false &&
@@ -183,23 +202,33 @@ namespace Madam_Client
 
             foreach (ManagementObject user in localUsers)
             {
-                Console.WriteLine("Account Type: " + user["AccountType"].ToString());
-                Console.WriteLine("Caption: " + user["Caption"].ToString());
-                Console.WriteLine("Description: " + user["Description"].ToString());
-                Console.WriteLine("Disabled: " + user["Disabled"].ToString());
-                Console.WriteLine("Domain: " + user["Domain"].ToString());
-                Console.WriteLine("Full Name: " + user["FullName"].ToString());
-                Console.WriteLine("Local Account: " + user["LocalAccount"].ToString());
-                Console.WriteLine("Lockout: " + user["Lockout"].ToString());
-                Console.WriteLine("Name: " + user["Name"].ToString());
-                Console.WriteLine("Password Changeable: " + user["PasswordChangeable"].ToString());
-                Console.WriteLine("Password Expires: " + user["PasswordExpires"].ToString());
-                Console.WriteLine("Password Required: " + user["PasswordRequired"].ToString());
-                Console.WriteLine("SID: " + user["SID"].ToString());
-                Console.WriteLine("SID Type: " + user["SIDType"].ToString());
-                Console.WriteLine("Status: " + user["Status"].ToString());
-                Console.WriteLine(Environment.NewLine);
+                Users tempuser = new Users();
+                tempuser.accounttype=("Account Type: " + user["AccountType"].ToString());
+                tempuser.description = ("Description: " + user["Description"].ToString());
+                tempuser.domain = ("Domain: " + user["Domain"].ToString());
+                tempuser.fullName = ("Full Name: " + user["FullName"].ToString());
+                tempuser.LocalAccount = ("Local Account: " + user["LocalAccount"].ToString());
+                tempuser.name = ("Name: " + user["Name"].ToString());
+                tempuser.PasswordExpire = ("Password Expires: " + user["PasswordExpires"].ToString());
+                tempuser.SID = ("SID: " + user["SID"].ToString());
+                tempuser.SidType = ("SID Type: " + user["SIDType"].ToString());
+                tempuser.Status = ("Status: " + user["Status"].ToString());
+                userList.Add(tempuser);
             }
+            SendUsers(userList);
+        }
+
+        private void SendUsers(List<Users> listToSend)
+        {
+
+            //create tcp client to the endpoint
+            TcpClient client = new TcpClient("192.168.88.11", 42069);
+            NetworkStream nwStream = client.GetStream();
+            
+            BinaryFormatter bf = new BinaryFormatter();
+            bf.Serialize(nwStream, listToSend);
+            nwStream.Close();
+            client.Close();
         }
 
     }
