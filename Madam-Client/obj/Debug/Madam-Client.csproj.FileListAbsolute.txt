@@ -5,3 +5,9 @@ C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.csp
 C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.csproj.CoreCompileInputs.cache
 C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.exe
 C:\Users\jimhe\Source\Repos\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.pdb
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.exe.config
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.exe
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.pdb
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.exe
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\bin\Debug\Madam-Client.pdb
+C:\Users\Pope\Source\Repos\popejim\MADAM-Client\Madam-Client\obj\Debug\Madam-Client.csprojResolveAssemblyReference.cache

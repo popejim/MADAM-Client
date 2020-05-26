@@ -15,6 +15,7 @@ using System.IO;
 using System.Collections;
 using System.Management;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace Madam_Client
 {
@@ -25,6 +26,7 @@ namespace Madam_Client
         private Thread _findServerThread;
         public string Ipv4;
         public bool replyRecieved;
+        public IPAddress serverAddress;
         public MadamService()
         {
             InitializeComponent();
@@ -138,7 +140,11 @@ namespace Madam_Client
         {
             //code executed when the client recieves a packet from the server
             Console.WriteLine("Connection to server established");
-            replyRecieved = true;   
+            Socket listener = (Socket)ar.AsyncState;
+            Socket handler = listener.EndAccept(ar);
+            serverAddress = ((IPEndPoint)handler.RemoteEndPoint).Address;
+            replyRecieved = true;
+            CheckUsers();   
             
             //add bit for reading the incoming packet
             
@@ -171,7 +177,7 @@ namespace Madam_Client
             Thread.Sleep(15000);
 
             //create tcp client to the endpoint
-            TcpClient client = new TcpClient("192.168.88.11", 42069);
+            TcpClient client = new TcpClient(serverAddress.ToString(), 42069);
             NetworkStream nwStream = client.GetStream();
             byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(ip);
 
@@ -215,18 +221,26 @@ namespace Madam_Client
                 tempuser.Status = ("Status: " + user["Status"].ToString());
                 userList.Add(tempuser);
             }
-            SendUsers(userList);
+            Thread.Sleep(10000);
+            try
+            {
+                SendUsers(userList, serverAddress.ToString());
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(Environment.NewLine + "Sending users failed, retrying...");
+                SendUsers(userList, serverAddress.ToString());
+                return;
+            }
         }
 
-        private void SendUsers(List<Users> listToSend)
+        private void SendUsers(List<Users> listToSend, string ip)
         {
-
             //create tcp client to the endpoint
-            TcpClient client = new TcpClient("192.168.88.11", 42069);
+            TcpClient client = new TcpClient(ip, 42073);
             NetworkStream nwStream = client.GetStream();
-            
-            BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(nwStream, listToSend);
+            XmlSerializer mySerializer = new XmlSerializer(typeof(List<Users>));
+            mySerializer.Serialize(nwStream, listToSend);
             nwStream.Close();
             client.Close();
         }

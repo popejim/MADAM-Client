@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Madam_Client
 {
     [Serializable]
-    class Users
+    public class Users
     {
         public string accounttype { get; set; }
         public string description { get; set; }
